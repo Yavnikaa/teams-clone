@@ -20,5 +20,6 @@ database.mongoose.connect(`mongodb+srv://${dbConfig.username}:${dbConfig.passwor
 });
 
 app.use('/api/v1/user',router.user)
+app.use('/api/v1/login', router.auth)
 
 app.listen(8080);
