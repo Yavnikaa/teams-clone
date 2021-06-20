@@ -2,10 +2,16 @@ import express from 'express'
 import router from './routes'
 import database from './models';
 import dbConfig from './db-config.json'
+import config from 'config'
 const app=express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
+
+if (!config.get('PrivateKey')) {
+    console.error('FATAL ERROR: PrivateKey is not defined.');
+    process.exit(1);
+}
 
 database.mongoose.connect(`mongodb+srv://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}/${dbConfig.database}?retryWrites=true&w=majority`, {
     useNewUrlParser: true,

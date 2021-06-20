@@ -1,5 +1,8 @@
 import {User, validateUser} from "../models/user"
+import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import config from 'config'
+import _ from 'lodash'
 
 export const authController = async (req,res) => {
     const {error,value} = validateUser(req.body);
@@ -19,5 +22,7 @@ export const authController = async (req,res) => {
         return res.status(400).json("Invalid username or password");
     }
 
-    res.send(true);
+    const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'));
+    res.header('x-auth-token', token).send(_.pick(user, ['_id', 'username', 'email']));
+
 }
