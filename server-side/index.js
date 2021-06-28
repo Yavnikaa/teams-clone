@@ -15,7 +15,8 @@ if (!config.get('PrivateKey')) {
 
 database.mongoose.connect(`mongodb+srv://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}/${dbConfig.database}?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true,
 })
 .then(() => {
     console.log("Successfully connected to MongoDB.");
