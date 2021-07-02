@@ -61,5 +61,6 @@ io.on("connection", (socket) => {
 
 app.use('/api/v1/user',router.user)
 app.use('/api/v1/login', router.auth)
+app.use('/api/v1/chat', router.chatroom)
 
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
