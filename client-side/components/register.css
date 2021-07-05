@@ -1,0 +1,9 @@
+.container{
+    display: flex; 
+}
+
+.image_holder{
+    display:flex;
+    max-width:50%;
+    height: 40%;
+}

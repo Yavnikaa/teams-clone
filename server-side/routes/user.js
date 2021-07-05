@@ -1,6 +1,6 @@
 import router from './router'
 import {registrationController} from '../controller/user_controller'
 
-router.get('/register', registrationController)
+router.post('/register', registrationController)
 
 export default router;
