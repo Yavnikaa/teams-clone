@@ -16,17 +16,17 @@ const Login=(props)=>{
     const [password,setPassword]=useState();
     
     const postdata=async(e)=>{
-        e.preventdefault();
+        // e.preventdefault();
         console.log(username);
         console.log(password);
         const res= await axios({
             method:"POST",
-            url:'/api/v1/user/auth',
+            url:'http://localhost:8080/api/v1/user/auth',
             headers: {
                 "Content-Type": "application/json"
             },
             data: JSON.stringify({
-                username, email
+                username, password
             }),
             responseType: "json"
         }).then((res)=>{
@@ -49,12 +49,12 @@ return (
         </div>
         <br/>
         <div style={{ fontSize: FontSizes.size20 }}>
-            <form onSubmit={postdata} className="form">
+            <form  className="form">
                 <TextField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 <br/>
                 <TextField label="Password" value={password} onChange={(e) => setPassword(e.target.value)}type="password" canRevealPassword revealPasswordAriaLabel="Show password"/>
                 <br/>
-                <PrimaryButton onclick={postdata}> Sign in </PrimaryButton>
+                <PrimaryButton onClick={postdata}> Sign in </PrimaryButton>
             </form>
         </div>
         </div>

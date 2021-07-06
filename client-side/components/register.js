@@ -19,14 +19,14 @@ const Register= () => {
     const [bio,setBio]=useState();
 
     const postdata=async(e)=>{
-        e.preventdefault();
+        // e.preventdefault();
         console.log(email);
         console.log(username);
         console.log(password);
         console.log(bio);
         const res= await axios({
             method:"POST",
-            url:'/api/v1/user/register',
+            url:'http://localhost:8080/api/v1/user/register',
             headers: {
                 "Content-Type": "application/json"
             },
@@ -52,7 +52,7 @@ const Register= () => {
         </div>
         <br/>
         <div style={{ fontSize: FontSizes.size20 }}>
-            <form onSubmit={postdata} className="form">
+            <form className="form">
                 <TextField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required  />
                 <br/>
                 <TextField label="Password" value={password} onChange={(e) => setPassword(e.target.value)}type="password" canRevealPassword revealPasswordAriaLabel="Show password"/>
@@ -61,7 +61,7 @@ const Register= () => {
                 <br/>
                 <TextField label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} required/>
                 <br/> <br/>
-                <PrimaryButton onclick={postdata}> Register </PrimaryButton>
+                <PrimaryButton onClick={postdata}> Register </PrimaryButton>
             </form>
         </div>
         </div>
