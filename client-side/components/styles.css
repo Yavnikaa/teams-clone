@@ -1,0 +1,29 @@
+.container{
+    display: flex; 
+    width:80%;
+}
+
+.floatleft {
+    float:left; 
+    width: 60%;
+    height: 400px;
+    padding-top: 40px;
+    padding-right:10%;
+    margin-block-end: auto;
+}
+
+.floatright {
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    padding-left: 30px;
+    float: right;
+    height: auto;
+    width: 30%;
+    margin-block-start: 18%;
+}
+
+.image{
+    margin-block-start: 12%;
+}
+

@@ -7,67 +7,59 @@ import { FontSizes } from '@fluentui/theme';
 import { Depths } from '@fluentui/theme';
 import { TextField } from '@fluentui/react/lib/TextField';
 import {PrimaryButton } from '@fluentui/react/lib/Button';
-import './styles.css';
-import placeholderimage from '../../assets/signup.png';
+import LoginImage from '../../assets/login.png';
+import './styles.css'
 
-
-const Register= () => {
+const Login=(props)=>{
     let history=useHistory();
     const [username, setUsername]=useState();
-    const [email,setEmail]=useState();
     const [password,setPassword]=useState();
-    const [bio,setBio]=useState();
-
+    
     const postdata=async(e)=>{
         e.preventdefault();
-        console.log(email);
         console.log(username);
         console.log(password);
-        console.log(bio);
         const res= await axios({
             method:"POST",
-            url:'/api/v1/user/register',
+            url:'/api/v1/user/auth',
             headers: {
                 "Content-Type": "application/json"
             },
             data: JSON.stringify({
-                username, email, password,bio
+                username, email
             }),
             responseType: "json"
-        }).then(res=>{
+        }).then((res)=>{
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('username', res.data.username);
             history.push('/');
-            console.log(res);
+            window.location.reload();
         }).catch((error)=>{
-            console.log("2",error.response);
-        })
-    }
-    return (
-        <div className="container">
-            <section className="floatleft">
-                <img src={placeholderimage} width="100%" className="image"/>
-            </section>
-        <div style={{ boxShadow: Depths.depth8 }} className="floatright">
-        <div style={{ fontSize: FontSizes.size24 }} >
-            Sign up!
+        console.log("2",error.response);
+    })
+}
+return (
+    <div className="container">
+        <section className="floatleft">
+                <img src={LoginImage} />
+        </section>
+        <div style={{ boxShadow: Depths.depth8 }} className="floatright">;
+        <div style={{ fontSize: FontSizes.size24 }}>
+            Login here!
         </div>
         <br/>
         <div style={{ fontSize: FontSizes.size20 }}>
             <form onSubmit={postdata} className="form">
-                <TextField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required  />
+                <TextField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 <br/>
                 <TextField label="Password" value={password} onChange={(e) => setPassword(e.target.value)}type="password" canRevealPassword revealPasswordAriaLabel="Show password"/>
                 <br/>
-                <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
-                <br/>
-                <TextField label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} required/>
-                <br/> <br/>
-                <PrimaryButton onclick={postdata}> Register </PrimaryButton>
+                <PrimaryButton onclick={postdata}> Sign in </PrimaryButton>
             </form>
         </div>
         </div>
-        </div>
-    )
-
+    </div>
+)
 }
 
-export default Register
+export default Login
