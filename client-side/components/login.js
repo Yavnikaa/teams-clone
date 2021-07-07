@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom';
 import regeneratorRuntime from "regenerator-runtime";
 
 import { FontSizes } from '@fluentui/theme';
@@ -14,11 +15,13 @@ const Login=(props)=>{
     let history=useHistory();
     const [username, setUsername]=useState();
     const [password,setPassword]=useState();
+    const [email,setEmail]=useState();
     
     const postdata=async(e)=>{
         // e.preventdefault();
         console.log(username);
         console.log(password);
+        console.log(email);
         const res= await axios({
             method:"POST",
             url:'http://localhost:8080/api/v1/user/auth',
@@ -26,7 +29,7 @@ const Login=(props)=>{
                 "Content-Type": "application/json"
             },
             data: JSON.stringify({
-                username, password
+                username, password,email
             }),
             responseType: "json"
         }).then((res)=>{
@@ -41,7 +44,7 @@ const Login=(props)=>{
 return (
     <div className="container">
         <section className="floatleft">
-                <img src={LoginImage} />
+                <img src={LoginImage} className="image-login" />
         </section>
         <div style={{ boxShadow: Depths.depth8 }} className="floatright">;
         <div style={{ fontSize: FontSizes.size24 }}>
@@ -50,12 +53,18 @@ return (
         <br/>
         <div style={{ fontSize: FontSizes.size20 }}>
             <form  className="form">
+               <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <br/>
                 <TextField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 <br/>
                 <TextField label="Password" value={password} onChange={(e) => setPassword(e.target.value)}type="password" canRevealPassword revealPasswordAriaLabel="Show password"/>
                 <br/>
                 <PrimaryButton onClick={postdata}> Sign in </PrimaryButton>
             </form>
+            <br/>
+            <div style={{ fontSize: FontSizes.size16 }}> New here?
+            <Link to="/register"  style={{ fontSize: FontSizes.size16 }} className="link" > Register. </Link>
+            </div>
         </div>
         </div>
     </div>

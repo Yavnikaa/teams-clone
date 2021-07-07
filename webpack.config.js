@@ -13,8 +13,14 @@ module.exports = {
  devServer: {
    port: 3000,
    watchContentBase: true,
-   historyApiFallback: true
- },
+   historyApiFallback: true,
+   proxy: {
+    '/api': {
+        target: 'http://localhost:8080/api',
+        secure: false
+    }
+  }
+},
   // Rules of how webpack will take our files, complie & bundle them for the browser 
  module: {
    rules: [

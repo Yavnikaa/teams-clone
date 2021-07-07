@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom';
 import regeneratorRuntime from "regenerator-runtime";
 
 import { FontSizes } from '@fluentui/theme';
@@ -35,7 +36,7 @@ const Register= () => {
             }),
             responseType: "json"
         }).then(res=>{
-            history.push('/');
+            history.push('/login');
             console.log(res);
         }).catch((error)=>{
             console.log("2",error.response);
@@ -47,6 +48,7 @@ const Register= () => {
                 <img src={placeholderimage} width="100%" className="image"/>
             </section>
         <div style={{ boxShadow: Depths.depth8 }} className="floatright">
+        <br/>
         <div style={{ fontSize: FontSizes.size24 }} >
             Sign up!
         </div>
@@ -63,6 +65,10 @@ const Register= () => {
                 <br/> <br/>
                 <PrimaryButton onClick={postdata}> Register </PrimaryButton>
             </form>
+            <br/>
+            <div style={{ fontSize: FontSizes.size16 }}> Already have an account?
+            <Link to="/login"  style={{ fontSize: FontSizes.size16 }} className="link" > Login. </Link>
+            </div>
         </div>
         </div>
         </div>
