@@ -8,6 +8,9 @@ import isAuthenticated from './middleware/is-authenticated'
 const app = express();
 const cors = require("cors")
 
+const { ExpressPeerServer } = require('peer');
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -34,30 +37,14 @@ database.mongoose.connect(`mongodb+srv://${dbConfig.username}:${dbConfig.passwor
     });
 
 const server = require("http").createServer(app);
-export const io = require("socket.io")(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
+const peerServer = ExpressPeerServer(server, {
+    path: '/vc-app'
+  });
+  
+  app.use('/peerjs', peerServer);
 
 app.use(cors());
 
-io.on("connection", (socket) => {
-    socket.emit("me", socket.id);
-
-    socket.on("disconnect", () => {
-        socket.broadcast.emit("callEnded")
-    });
-
-    socket.on("callUser", ({ userToCall, signalData, from, name }) => {
-        io.to(userToCall).emit("callUser", { signal: signalData, from, name });
-    });
-
-    socket.on("answerCall", (data) => {
-        io.to(data.to).emit("callAccepted", data.signal)
-    });
-});
 
 app.use('/api/v1/user', router.user)
 app.use('/api/v1/user', router.auth)

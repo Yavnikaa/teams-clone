@@ -5,21 +5,20 @@ import Register from './components/register'
 import Login from './components/login'
 import Dashboard from './components/dashboard'
 ReactDom.render(
-    <div>
-        <Router>
-            <Switch>
-                <Route path="/register">
-                    <Register />
-                </Route>
+    <Router>
+        <Switch>
+            <Route path="/register">
+                <Register />
+            </Route>
 
-                <Route path="/login">
-                    <Login />
-                </Route>
+            <Route path="/login">
+                <Login />
+            </Route>
 
-                <Route path="/">
-                    <Dashboard />
-                </Route>
-            </Switch>
-        </Router>
-    </div>,
+            <Route path="/">
+                <Dashboard />
+            </Route>
+        </Switch>
+    </Router>
+    ,
     document.getElementById('app'))
