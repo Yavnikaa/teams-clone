@@ -4,12 +4,12 @@ import database from './models';
 import dbConfig from './db-config.json'
 import config from 'config'
 import dotenv from 'dotenv'
-
-const app=express();
-const cors=require("cors")
+import isAuthenticated from './middleware/is-authenticated'
+const app = express();
+const cors = require("cors")
 
 app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({ extended: false }));
 
 const PORT = process.env.PORT || 8080;
 
@@ -25,13 +25,13 @@ database.mongoose.connect(`mongodb+srv://${dbConfig.username}:${dbConfig.passwor
     useUnifiedTopology: true,
     useCreateIndex: true,
 })
-.then(() => {
-    console.log("Successfully connected to MongoDB.");
-})
-.catch(err => {
-    console.error("Connection error", err);
-    process.exit();
-});
+    .then(() => {
+        console.log("Successfully connected to MongoDB.");
+    })
+    .catch(err => {
+        console.error("Connection error", err);
+        process.exit();
+    });
 
 const server = require("http").createServer(app);
 export const io = require("socket.io")(server, {
@@ -57,11 +57,11 @@ io.on("connection", (socket) => {
     socket.on("answerCall", (data) => {
         io.to(data.to).emit("callAccepted", data.signal)
     });
-}); 
+});
 
-app.use('/api/v1/user',router.user)
+app.use('/api/v1/user', router.user)
 app.use('/api/v1/user', router.auth)
-app.use('/api/v1/chat', router.chatroom)
-app.use('/api/v1/all', router.all_users)
+app.use('/api/v1/all', isAuthenticated, router.all_users)
+app.use('/api/v1/chat', isAuthenticated, router.chat)
 
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
