@@ -4,22 +4,22 @@ body {
   margin: 0;
   width: 100%;
   height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 div {
   box-sizing: border-box;
 }
 
-hr{
-  border:1px solid rgb(16, 110, 190);
+hr {
+  border: 1px solid rgb(16, 110, 190);
 }
 
-.dash{
-  width:100%;
-  height:100%;
+.dash {
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
-
 
 #app {
   width: 100%;
@@ -69,81 +69,157 @@ hr{
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  padding: 10px;
-  height: 100%;
+  height: calc(100vh - 52px);
 }
 .dash-left-div {
   width: 25%;
+  height: 100%;
+}
+.left-stack {
+  overflow-y: auto;
+  height: calc(100% - 52px);
 }
 .dash-right-div {
   width: 75%;
   display: flex;
   flex-direction: column;
   height: 90vh;
+  background: #f3f2f1;
+  align-items: center;
 }
 .dash-messages {
   flex-grow: 2;
-  padding: 10px;
   display: flex;
   flex-direction: column-reverse;
   overflow-y: scroll;
+  width: 90%;
 }
 .dash-send {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: 90%;
   align-items: flex-end;
   padding: 10px;
   box-sizing: border-box;
 }
 .send-btn {
   margin-left: 10px;
+  font-size: 18px;
+  color: #605e5c;
+}
+.send-btn:hover {
+  color: #6264a7;
 }
 .message-text-field {
   flex-grow: 2;
 }
-
+.message-text-field #TextField5:focus {
+  border-bottom: 2px solid #6264a7;
+}
 .selected-persona {
-  background-color: #e7e7e7;
+  background-color: #edebe9;
 }
 
 .user-persona {
   cursor: pointer;
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 5%;
+}
+.new-ms {
+  background-color: #6264a7;
+  color: #fff;
+  font-size: 12px;
+  padding: 3px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 .user-persona:hover {
-  background-color: #f7f7f7;
+  background-color: #f3f2f1;
 }
 
 .message-bubble {
-  display: inline-block;
-  width: max-content;
-  padding: 10px;
   margin: 5px;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.message-text {
+  width: max-content;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 14px;
+  color: rgb(36, 36, 36);
 }
 .my-bubble {
-  background-color: #e7e7e7;
   align-self: flex-end;
 }
-
+.my-bubble > .message-text {
+  background-color: #e7e7e7;
+}
 .your-bubble {
-  background-color: #E4F5FB;
   align-self: flex-start;
 }
+.your-bubble > .message-text {
+  background-color: #fff;
+  margin-left: 10px;
+}
 
-.header{
+.dash-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #464775;
+  height: 52px;
+}
+.dash-title {
+  color: #fff;
+}
+.dash-user {
   display: flex;
   flex-direction: row-reverse;
-  align-items:flex-end;
-  padding: 20px;
-  padding-bottom: 5px;
+}
+.timestamp {
+  padding-bottom: 3px;
+  font-size: 12px;
+  color: #605e5c;
+}
+.timestamp > .username {
+  display: inline;
+  margin-right: 3px;
+  color: rgb(36, 36, 36);
+  font-weight: 600;
+
+  text-transform: uppercase;
+}
+.my-persona > .ms-Persona-details > div {
+  color: #fff !important;
 }
 
-.timestamp{
-  padding-top: 3px;
-  font-size: small;
-  text-align: right ;
-
+.left-header {
+  border-bottom: #c8c6c4 1px solid;
+  padding: 15px 10px;
+  font-weight: 600;
+  font-weight: 18px;
+  height: 52px;
 }
 
-
+.dash-right-div > .right-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  padding: 9px 5% 10px 5%;
+  border-bottom: #c8c6c4 1px solid;
+  width: 100%;
+}

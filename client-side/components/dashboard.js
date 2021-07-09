@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router'
 import { useHistory } from 'react-router'
 import axios from 'axios'
-import { TextField, Persona, PersonaSize, Stack, PrimaryButton, PersonaPresence, IconButton, IconProps } from '@fluentui/react'
+import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton,  } from '@fluentui/react'
 import Peer from 'peerjs'
 import './styles.css'
-
+import { FontSizes, FontWeights } from '@fluentui/theme';
 const userId = localStorage.getItem('id');
-const my_username= localStorage.getItem('username');
+const my_username = localStorage.getItem('username');
 const peer = new Peer(userId)
 
 const Dashboard = ({ }) => {
@@ -29,9 +29,9 @@ const Dashboard = ({ }) => {
     const formatDate = (dateString) => {
         const options = { year: "numeric", month: "long", day: "numeric" }
         return new Date(dateString).toLocaleDateString(undefined, options)
-      }
+    }
 
-    const logout_icon = {iconName:'FollowUser'}
+    const logout_icon = { iconName: 'FollowUser' }
 
     if (!token) {
         return <Redirect to='/login' />
@@ -132,48 +132,77 @@ const Dashboard = ({ }) => {
     }, [newMessage]);
     return (
         <div className='dash'>
-        <div className='header'>
-            <IconButton onClick={logout} iconProps={logout_icon} />
-            <Persona secondaryText="Available" text={my_username} size={PersonaSize.size32}  presence= {PersonaPresence.online} />
-            <hr/>
-        </div>
-        <div className='dash-container'>
-            <div className='dash-left-div'>
-                <Stack tokens={{ childrenGap: 20 }} >
-                    {users.map((user, i) => {
-                        if (users[i].username!=my_username){
-                            return (
-                                <Persona key={i} className={`${(selectedUser && user.username === selectedUser.username) ? 'selected-persona' : ''} user-persona`} text={users[i].username} size={PersonaSize.size48} secondaryText={users[i].bio} 
-                                    value={selectedUser} onClick={(e) => setSelectedUser(user)} />
-                            )
-                        }
-                    })}
-                </Stack>
-            </div>
-            <div className='dash-right-div'>
-                <div className='dash-messages'>
-                    {selectedChat.map(chat => {
-                        return (
-
-                            <div key={chat._id} className={`message-bubble ${chat.sender === selectedUser._id ? 'your-bubble' : 'my-bubble'}`} >{chat.message}
-                            <div className='timestamp'> {chat.updatedAt.slice(11,16)} </div>
-                             </div>
-                        )
-                    })} 
+            <div className='dash-header'>
+                <div className='dash-title' style={{ fontSize: FontSizes.size18, fontWeight: FontWeights.semibold }}>Microsoft Teams</div>
+                <div className='dash-user'>
+                    <IconButton onClick={logout} iconProps={logout_icon} style={{ color: "#fff" }} />
+                    <Persona className="my-persona" secondaryText="Available" text={my_username} size={PersonaSize.size32} presence={PersonaPresence.online} />
                 </div>
-                <div className='dash-send'>
-                    <TextField value={message} multiline resizable={false} rows={2} placeholder='Enter Message' className='message-text-field'
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyPress={(event) => {
-                            if (event.key === 'Enter') {
-                                sendMessage()
+            </div>
+            <div className='dash-container'>
+                <div className='dash-left-div'>
+                    <div className='left-header'>Chat</div>
+                    <Stack className='left-stack' >
+                        {users.map((user, i) => {
+                            if (users[i].username != my_username) {
+                                return (
+                                    <div className={`${(selectedUser && user.username === selectedUser.username) ? 'selected-persona' : ''} user-persona`} onClick={(e) => {
+                                        setUsers(users.filter(u => {
+                                            if (user._id == u._id) u.count = 0;
+                                            return u
+                                        }))
+                                        setSelectedUser(user)
+                                    }} >
+                                        <Persona key={i} text={users[i].username} size={PersonaSize.size40} secondaryText={users[i].bio} />
+                                        {user.count > 0 ? <div className='new-ms'>{user.count}</div> : null}
+                                    </div>
+                                )
                             }
-                        }}
-                    />
-                    <PrimaryButton onClick={sendMessage} text="Send" className='send-btn' />
+                        })}
+                    </Stack>
+                </div>
+                <div className='dash-right-div'>
+                    <div className="right-header">
+                        <div className='chat-person'>
+                            {selectedUser && <Persona size={PersonaSize.size32}
+                                text={selectedUser.username} />}
+                        </div>
+                    </div>
+                    <div className='dash-messages'>
+                        {selectedChat.map(chat => {
+                            const updatedAt = new Date(chat.updatedAt);
+                            const now = new Date();
+                            return (
+                                <div key={chat._id} className={`message-bubble ${chat.sender === selectedUser._id ? 'your-bubble' : 'my-bubble'}`}>
+                                    {chat.sender === selectedUser._id ? <Persona size={PersonaSize.size32}
+                                        text={selectedUser.username} hidePersonaDetails /> : null}
+                                    <div className='message-text'>
+                                        <div className='timestamp'>
+                                            <div className='username'>
+                                                {chat.sender === selectedUser._id ? selectedUser.username : null}
+                                            </div>
+                                            {now.toDateString() != updatedAt.toDateString() ? updatedAt.toLocaleDateString() : ''} {updatedAt.toLocaleTimeString()} </div>
+                                        <div>
+                                            {chat.message}
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className='dash-send'>
+                        <TextField value={message} borderless resizable={false} rows={2} placeholder='Type a new message' className='message-text-field'
+                            onChange={(e) => setMessage(e.target.value)}
+                            onKeyPress={(event) => {
+                                if (event.key === 'Enter') {
+                                    sendMessage()
+                                }
+                            }}
+                        />
+                        <IconButton onClick={sendMessage} iconProps={{ iconName: "send", style: { fontSize: '24px' } }} className='send-btn' />
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     )
 }
