@@ -6,12 +6,9 @@ import config from 'config'
 import dotenv from 'dotenv'
 import isAuthenticated from './middleware/is-authenticated'
 const app = express();
-const cors = require("cors")
+import { ExpressPeerServer } from 'peer'
 
-const { ExpressPeerServer } = require('peer');
-
-
-app.use(express.json());
+app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
 
 const PORT = process.env.PORT || 8080;
@@ -37,14 +34,11 @@ database.mongoose.connect(`mongodb+srv://${dbConfig.username}:${dbConfig.passwor
     });
 
 const server = require("http").createServer(app);
+
 const peerServer = ExpressPeerServer(server, {
-    path: '/vc-app'
-  });
-  
-  app.use('/peerjs', peerServer);
-
-app.use(cors());
-
+    path: '/teams-clone', debug: true,
+});
+app.use('/peerjs', peerServer);
 
 app.use('/api/v1/user', router.user)
 app.use('/api/v1/user', router.auth)

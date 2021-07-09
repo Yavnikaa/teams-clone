@@ -2,27 +2,22 @@ import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router'
 import { useHistory } from 'react-router'
 import axios from 'axios'
-import Peer from 'peerjs'
 import logout from '../utils/logout'
-import { TextField, Persona, PersonaSize, Stack, PrimaryButton , PersonaPresence, Icon, IIconProps} from '@fluentui/react'
-
-
+import { TextField, Persona, PersonaSize, Stack, PrimaryButton, PersonaPresence, Icon, IIconProps } from '@fluentui/react'
+import Peer from 'peerjs'
 import './styles.css'
 
-
-const userId= localStorage.getItem('id');
+const userId = localStorage.getItem('id');
 const my_username= localStorage.getItem('username');
-const peer= new Peer(userId, {debug:3});
-
+const peer = new Peer(userId)
 
 const Dashboard = ({ }) => {
-    
     let history = useHistory();
     const [users, setUsers] = useState([])
     const [message, setMessage] = useState('')
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedChat, setSelectedChat] = useState([])
-    const [newMessage, setNewMessage]=useState(null)
+    const [newMessage, setNewMessage] = useState(null)
     const token = localStorage.getItem('token')
     if (!token) {
         return <Redirect to='/login' />
@@ -83,9 +78,9 @@ const Dashboard = ({ }) => {
                     }
                 })
                 setSelectedChat([res.data, ...selectedChat])
-                const conn= peer.connect(selectedUser._id);
-                conn.on('open', ()=> {
-                    conn.send({...res.data, type:'text-message'})
+                const conn = peer.connect(selectedUser._id);
+                conn.on('open', () => {
+                    conn.send({ ...res.data, type: 'text-message' })
                 })
                 setMessage('')
             } catch (err) {
@@ -93,34 +88,34 @@ const Dashboard = ({ }) => {
             }
         }
     }
-
-  
     useEffect(async () => {
         await getUsers(true);
-        peer.on('connection', (conn)=>{
+        peer.on('connection', (conn) => {
             conn.on('data', (data) => {
-                console.log("3", data);
-                setNewMessage(data);
+                setNewMessage(data)
             })
-        })
+        });
     }, []);
-
-
     useEffect(() => {
         if (selectedUser) getMessages(selectedUser.username)
     }, [selectedUser]);
-
-    useEffect(()=> {
-        if (newMessage && newMessage.type==='text-message'){
-            console.log("ajfdvdnms")
-            console.log(newMessage, selectedUser);
-            if (newMessage.sender=== selectedUser._id){
+    useEffect(() => {
+        if (newMessage && newMessage.type === 'text-message') {
+            if (newMessage.sender === selectedUser._id) {
                 setSelectedChat([newMessage, ...selectedChat])
-                console.log(newMessage);
             }
+            let sender;
+            let curUsers = users.filter(user => {
+                if (user._id === newMessage.sender) {
+                    sender = user;
+                    sender.count = sender.count ? sender.count + 1 : 1;
+                }
+                return user._id != newMessage.sender
+            })
+            if (sender) curUsers = [sender, ...curUsers]
+            setUsers(curUsers)
         }
     }, [newMessage]);
-
     return (
         <div className='dash'>
         <div className='header'>
@@ -148,7 +143,7 @@ const Dashboard = ({ }) => {
                     })}
                 </div>
                 <div className='dash-send'>
-                    <TextField value={message} multiline resizable={false} rows={2} placeholder='enter message' className='message-text-field'
+                    <TextField value={message} multiline resizable={false} rows={2} placeholder='Enter Message' className='message-text-field'
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyPress={(event) => {
                             if (event.key === 'Enter') {

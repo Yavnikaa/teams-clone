@@ -2,9 +2,9 @@ import React from "react"
 import ReactDom from "react-dom"
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Register from './components/register'
-import { initializeIcons } from '@fluentui/font-icons-mdl2';
 import Login from './components/login'
 import Dashboard from './components/dashboard'
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
 
 initializeIcons();
 
