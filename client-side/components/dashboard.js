@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router'
 import { useHistory } from 'react-router'
 import axios from 'axios'
-import logout from '../utils/logout'
-import { TextField, Persona, PersonaSize, Stack, PrimaryButton, PersonaPresence, Icon, IIconProps } from '@fluentui/react'
+import { TextField, Persona, PersonaSize, Stack, PrimaryButton, PersonaPresence, IconButton, IconProps } from '@fluentui/react'
 import Peer from 'peerjs'
 import './styles.css'
 
@@ -19,6 +18,21 @@ const Dashboard = ({ }) => {
     const [selectedChat, setSelectedChat] = useState([])
     const [newMessage, setNewMessage] = useState(null)
     const token = localStorage.getItem('token')
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('id');
+        history.replace('/login');
+    }
+
+    const formatDate = (dateString) => {
+        const options = { year: "numeric", month: "long", day: "numeric" }
+        return new Date(dateString).toLocaleDateString(undefined, options)
+      }
+
+    const logout_icon = {iconName:'FollowUser'}
+
     if (!token) {
         return <Redirect to='/login' />
     }
@@ -119,7 +133,9 @@ const Dashboard = ({ }) => {
     return (
         <div className='dash'>
         <div className='header'>
+            <IconButton onClick={logout} iconProps={logout_icon} />
             <Persona secondaryText="Available" text={my_username} size={PersonaSize.size32}  presence= {PersonaPresence.online} />
+            <hr/>
         </div>
         <div className='dash-container'>
             <div className='dash-left-div'>
@@ -138,9 +154,12 @@ const Dashboard = ({ }) => {
                 <div className='dash-messages'>
                     {selectedChat.map(chat => {
                         return (
-                            <div key={chat._id} className={`message-bubble ${chat.sender === selectedUser._id ? 'your-bubble' : 'my-bubble'}`}>{chat.message}</div>
+
+                            <div key={chat._id} className={`message-bubble ${chat.sender === selectedUser._id ? 'your-bubble' : 'my-bubble'}`} >{chat.message}
+                            <div className='timestamp'> {chat.updatedAt.slice(11,16)} </div>
+                             </div>
                         )
-                    })}
+                    })} 
                 </div>
                 <div className='dash-send'>
                     <TextField value={message} multiline resizable={false} rows={2} placeholder='Enter Message' className='message-text-field'
