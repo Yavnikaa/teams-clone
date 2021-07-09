@@ -4,12 +4,16 @@ import { useHistory } from 'react-router'
 import axios from 'axios'
 import Peer from 'peerjs'
 import logout from '../utils/logout'
-import { TextField, Persona, PersonaSize, Stack, PrimaryButton } from '@fluentui/react'
+import { TextField, Persona, PersonaSize, Stack, PrimaryButton , PersonaPresence, Icon, IIconProps} from '@fluentui/react'
+
 
 import './styles.css'
 
+
 const userId= localStorage.getItem('id');
+const my_username= localStorage.getItem('username');
 const peer= new Peer(userId, {debug:3});
+
 
 const Dashboard = ({ }) => {
     
@@ -118,14 +122,20 @@ const Dashboard = ({ }) => {
     }, [newMessage]);
 
     return (
+        <div className='dash'>
+        <div className='header'>
+            <Persona secondaryText="Available" text={my_username} size={PersonaSize.size32}  presence= {PersonaPresence.online} />
+        </div>
         <div className='dash-container'>
             <div className='dash-left-div'>
                 <Stack tokens={{ childrenGap: 20 }} >
                     {users.map((user, i) => {
-                        return (
-                            <Persona key={i} className={`${(selectedUser && user.username === selectedUser.username) ? 'selected-persona' : ''} user-persona`} text={users[i].username} size={PersonaSize.size48} secondaryText={users[i].bio} imageInitials={users[i].username[0]}
-                                value={selectedUser} onClick={(e) => setSelectedUser(user)} />
-                        )
+                        if (users[i].username!=my_username){
+                            return (
+                                <Persona key={i} className={`${(selectedUser && user.username === selectedUser.username) ? 'selected-persona' : ''} user-persona`} text={users[i].username} size={PersonaSize.size48} secondaryText={users[i].bio} 
+                                    value={selectedUser} onClick={(e) => setSelectedUser(user)} />
+                            )
+                        }
                     })}
                 </Stack>
             </div>
@@ -146,9 +156,10 @@ const Dashboard = ({ }) => {
                             }
                         }}
                     />
-                    <PrimaryButton onClick={sendMessage} text="Primary" className='send-btn' />
+                    <PrimaryButton onClick={sendMessage} text="Send" className='send-btn' />
                 </div>
             </div>
+        </div>
         </div>
     )
 }
