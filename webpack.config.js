@@ -14,6 +14,7 @@ module.exports = {
    port: 3000,
    watchContentBase: true,
    historyApiFallback: true,
+   disableHostCheck:true,
    proxy: {
     '/api': {
         target: 'http://localhost:8080/',
