@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState , useRef} from 'react'
 import { Redirect } from 'react-router'
 import { useHistory } from 'react-router'
 import axios from 'axios'
-import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton,  } from '@fluentui/react'
+import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton, Callout , Modal } from '@fluentui/react'
 import Peer from 'peerjs'
 import './styles.css'
 import { FontSizes, FontWeights } from '@fluentui/theme';
@@ -17,18 +17,17 @@ const Dashboard = ({ }) => {
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedChat, setSelectedChat] = useState([])
     const [newMessage, setNewMessage] = useState(null)
+    const [callOut, setCallOut] = useState(true)
+    const [modal, setModal] = useState(false)
+    const [stream1, setStream1] = useState(null)
     const token = localStorage.getItem('token')
+    const myStrRef= useRef()
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('id');
         history.replace('/login');
-    }
-
-    const formatDate = (dateString) => {
-        const options = { year: "numeric", month: "long", day: "numeric" }
-        return new Date(dateString).toLocaleDateString(undefined, options)
     }
 
     const logout_icon = { iconName: 'FollowUser' }
@@ -130,6 +129,24 @@ const Dashboard = ({ }) => {
             setUsers(curUsers)
         }
     }, [newMessage]);
+    
+    const requestLocalVideo = (success,fail) => {
+        navigator.getUserMedia= navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+        navigator.getUserMedia({audio:true, video:true}, success, fail)
+    }
+
+
+    const handleVideoCall=()=>{
+        const handleSuccess = (stream) => {
+           setModal(true)
+           setStream1()
+        }
+        const handleFail = () => {
+            setCallOut(false)
+        }
+        requestLocalVideo(handleSuccess,handleFail)
+    }
+
     return (
         <div className='dash'>
             <div className='dash-header'>
@@ -167,6 +184,7 @@ const Dashboard = ({ }) => {
                             {selectedUser && <Persona size={PersonaSize.size32}
                                 text={selectedUser.username} />}
                         </div>
+                        <IconButton onClick={handleVideoCall} iconProps={{iconName:"video", style: { fontSize: '24px' }}} className="call" id="call-btn" />
                     </div>
                     <div className='dash-messages'>
                         {selectedChat.map(chat => {
@@ -201,6 +219,17 @@ const Dashboard = ({ }) => {
                         />
                         <IconButton onClick={sendMessage} iconProps={{ iconName: "send", style: { fontSize: '24px' } }} className='send-btn' />
                     </div>
+                    <Callout isBeakVisible={false} target='#call-btn' className="permission-callout" hidden={callOut}> You need to give permissions for camera and microphone.
+                    <IconButton onClick={()=>setCallOut(true)} iconProps={{iconName:"ChromeClose" }} className="close-btn"/> </Callout>
+
+                    <Modal className='call-modal' isOpen={ modal} isBlocking={true}> <div className='vc-div'>
+                        <div className='stream-div'>
+                            <video ref={myStrRef} className='stream-one video-stream'> </video>
+                            <div className='stream-two video-stream'> </div>
+                        </div>
+                        <div className='control-div'> </div>
+                        </div>
+                        </Modal>
                 </div>
             </div>
         </div>

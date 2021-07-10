@@ -223,3 +223,23 @@ hr {
   border-bottom: #c8c6c4 1px solid;
   width: 100%;
 }
+
+.call{
+  padding: 0 20px;
+  border-radius: 3px;
+  border: #c8c6c4 1px solid;
+  background:#fff;
+  margin-inline-start: 87%;
+}
+
+.permission-callout{
+  border-radius: 3px;
+  border: #c8c6c4 1px solid;
+  background:#fff;
+  padding: 8px 20px;
+}
+
+.vc-div{
+  display:flex;
+  flex-direction:column;
+}
