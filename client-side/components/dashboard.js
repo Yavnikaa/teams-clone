@@ -40,7 +40,7 @@ const Dashboard = ({ }) => {
     const myStrRef = useCallback(node => {
         if (node !== null && stream1 !== null) {
             node.srcObject = stream1
-            node.muted=true
+            node.muted = true
         }
     })
     const othrStrRef = useCallback(node => {
@@ -181,7 +181,6 @@ const Dashboard = ({ }) => {
             })
             const call = peer.call(selectedUser._id, stream);
             call.on('stream', (stream) => {
-                console.log('stream', stream)
                 setCallStatus(CallStatus.ongoing)
                 setStream2(stream)
             })
@@ -226,6 +225,7 @@ const Dashboard = ({ }) => {
         }
         if (iCall) {
             iCall.on('stream', (stream) => setStream2(stream))
+            iCall.on('close', handleDisconnect)
         }
         setCallStatus(CallStatus.ongoing)
         if (iUser) {
@@ -264,7 +264,7 @@ const Dashboard = ({ }) => {
                         {users.map((user, i) => {
                             if (users[i].username != my_username) {
                                 return (
-                                    <div className={`${(selectedUser && user.username === selectedUser.username) ? 'selected-persona' : ''} user-persona`} onClick={(e) => {
+                                    <div key={user._id} className={`${(selectedUser && user.username === selectedUser.username) ? 'selected-persona' : ''} user-persona`} onClick={(e) => {
                                         setUsers(users.filter(u => {
                                             if (user._id == u._id) u.count = 0;
                                             return u
