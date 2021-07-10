@@ -1,8 +1,8 @@
-import React, { useEffect, useState , useRef} from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Redirect } from 'react-router'
 import { useHistory } from 'react-router'
 import axios from 'axios'
-import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton, Callout , Modal } from '@fluentui/react'
+import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton,Callout, FontIcon, Modal } from '@fluentui/react'
 import Peer from 'peerjs'
 import './styles.css'
 import { FontSizes, FontWeights } from '@fluentui/theme';
@@ -10,19 +10,43 @@ const userId = localStorage.getItem('id');
 const my_username = localStorage.getItem('username');
 const peer = new Peer(userId)
 
+const CallStatus = {
+    outgoing: "OUTGOING",
+    incoming: "INCOMING",
+    ongoing: "ONGOING",
+    idle: "IDLE"
+}
 const Dashboard = ({ }) => {
-    let history = useHistory();
+
+    const history = useHistory();
+    const token = localStorage.getItem('token')
+    const id = localStorage.getItem('id')
+    const username = localStorage.getItem('username')
+
     const [users, setUsers] = useState([])
     const [message, setMessage] = useState('')
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedChat, setSelectedChat] = useState([])
     const [newMessage, setNewMessage] = useState(null)
-    const [callOut, setCallOut] = useState(true)
+
+    const [callout, setCallout] = useState(true)
     const [modal, setModal] = useState(false)
     const [stream1, setStream1] = useState(null)
-    const token = localStorage.getItem('token')
-    const myStrRef= useRef()
+    const [stream2, setStream2] = useState(null)
+    const [callStatus, setCallStatus] = useState(CallStatus.idle)
+    const [iUser, setIUser] = useState(null)
+    const [iCall, setICall] = useState(null)
 
+    const myStrRef = useCallback(node => {
+        if (node !== null && stream1 !== null) {
+            node.srcObject = stream1
+        }
+    })
+    const othrStrRef = useCallback(node => {
+        if (node !== null && stream2 !== null) {
+            node.srcObject = stream2
+        }
+    })
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
@@ -108,6 +132,11 @@ const Dashboard = ({ }) => {
                 setNewMessage(data)
             })
         });
+        peer.on('call', (call) => {
+            setModal(true)
+            setCallStatus(CallStatus.incoming)
+            setICall(call)
+        });
     }, []);
     useEffect(() => {
         if (selectedUser) getMessages(selectedUser.username)
@@ -128,27 +157,90 @@ const Dashboard = ({ }) => {
             if (sender) curUsers = [sender, ...curUsers]
             setUsers(curUsers)
         }
+        else if (newMessage && newMessage.type === 'call-user') {
+            setIUser(newMessage)
+        }
+        else if (newMessage && newMessage.type === 'decline-call') handleDisconnect()
+        else if (newMessage && newMessage.type === 'accept-call') setCallStatus(CallStatus.ongoing)
+        else if (newMessage && newMessage.type === 'disconnect-call') handleDisconnect()
     }, [newMessage]);
-    
-    const requestLocalVideo = (success,fail) => {
-        navigator.getUserMedia= navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia
-        navigator.getUserMedia({audio:true, video:true}, success, fail)
+    const requestLocalVideo = (success, fail) => {
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+        navigator.getUserMedia({ audio: true, video: true }, success, fail)
     }
 
-
-    const handleVideoCall=()=>{
+    const handleVideoClick = () => {
         const handleSuccess = (stream) => {
-           setModal(true)
-           setStream1()
+            setModal(true)
+            setStream1(stream)
+            setCallStatus(CallStatus.outgoing)
+            const conn = peer.connect(selectedUser._id);
+            conn.on('open', () => {
+                conn.send({ username, _id: id, type: 'call-user' })
+            })
+            const call = peer.call(selectedUser._id, stream);
+            call.on('stream', (stream) => {
+                setCallStatus(CallStatus.ongoing)
+                setStream2(stream)
+            })
         }
         const handleFail = () => {
-            setCallOut(false)
+            setCallout(false)
         }
-        requestLocalVideo(handleSuccess,handleFail)
+        requestLocalVideo(handleSuccess, handleFail)
     }
+    const handleDisconnect = (broadcast = false) => {
+        setModal(false)
+        setCallStatus(CallStatus.idle)
+        setIUser(null)
+        if (stream1) {
+            stream1.getTracks().forEach((track) =>
+                track.stop())
+            setStream1(null)
+        }
+        if (stream2) {
+            stream2.getTracks().forEach((track) =>
+                track.stop())
+            setStream2(null)
 
+        }
+        if (broadcast) {
+            const conn = peer.connect(iUser ? iUser._id : selectedUser._id);
+            conn.on('open', () => {
+                conn.send({ username, _id: id, type: 'disconnect-call' })
+            })
+        }
+    }
+    const handleAccept = () => {
+        const handleSuccess = (stream) => {
+            setStream1(stream)
+            if (iCall) iCall.answer(stream)
+        }
+        const handleFail = () => {
+            if (iCall) iCall.answer();
+        }
+        setCallStatus(CallStatus.ongoing)
+        if (iUser) {
+            const conn = peer.connect(iUser._id);
+            conn.on('open', () => {
+                conn.send({ type: 'accept-call' })
+            })
+        }
+        requestLocalVideo(handleSuccess, handleFail)
+    }
+    const handleDecline = () => {
+        if (iUser) {
+            const conn = peer.connect(iUser._id);
+            conn.on('open', () => {
+                conn.send({ type: 'decline-call' })
+            })
+        }
+        setModal(false)
+        setCallStatus(CallStatus.idle)
+        setIUser(null)
+    }
     return (
-        <div className='dash'>
+        <div className='dash' >
             <div className='dash-header'>
                 <div className='dash-title' style={{ fontSize: FontSizes.size18, fontWeight: FontWeights.semibold }}>Microsoft Teams</div>
                 <div className='dash-user'>
@@ -184,7 +276,7 @@ const Dashboard = ({ }) => {
                             {selectedUser && <Persona size={PersonaSize.size32}
                                 text={selectedUser.username} />}
                         </div>
-                        <IconButton onClick={handleVideoCall} iconProps={{iconName:"video", style: { fontSize: '24px' }}} className="call" id="call-btn" />
+                        <IconButton onClick={handleVideoClick} iconProps={{ iconName: "video", style: { fontSize: '24px' } }} className='vcall-btn' id="call-btn" />
                     </div>
                     <div className='dash-messages'>
                         {selectedChat.map(chat => {
@@ -217,21 +309,52 @@ const Dashboard = ({ }) => {
                                 }
                             }}
                         />
-                        <IconButton onClick={sendMessage} iconProps={{ iconName: "send", style: { fontSize: '24px' } }} className='send-btn' />
+                        <IconButton onClick={sendMessage} className='send-btn' />
                     </div>
-                    <Callout isBeakVisible={false} target='#call-btn' className="permission-callout" hidden={callOut}> You need to give permissions for camera and microphone.
-                    <IconButton onClick={()=>setCallOut(true)} iconProps={{iconName:"ChromeClose" }} className="close-btn"/> </Callout>
-
-                    <Modal className='call-modal' isOpen={ modal} isBlocking={true}> <div className='vc-div'>
-                        <div className='stream-div'>
-                            <video ref={myStrRef} className='stream-one video-stream'> </video>
-                            <div className='stream-two video-stream'> </div>
-                        </div>
-                        <div className='control-div'> </div>
-                        </div>
-                        </Modal>
                 </div>
             </div>
+            <Callout isBeakVisible={false}
+                target='#call-btn'
+                className='permission-callout'
+                hidden={callout}
+                dis
+            >
+                <FontIcon onClick={() => setCallout(true)} iconName="ChromeClose" className='close-btn' />
+                <div className='callout-text'>
+                    You need to allow camera and microphone permissions to call!
+                </div>
+            </Callout>
+            <Modal className='call-modal' isOpen={modal}
+                isBlocking={true}
+            >{callStatus === CallStatus.ongoing || callStatus === CallStatus.outgoing ?
+                <div className='vc-div'>
+                    <div className='stream-div'>
+                        {stream1 ?
+                            <video autoPlay ref={myStrRef} className='stream-one video-stream'></video> : <div className='persona'>
+                            <Persona size={PersonaSize.size120} text={username} hidePersonaDetails /> </div>
+                        }
+                        {callStatus === CallStatus.ongoing ? <>
+                            {stream2 ?
+                                <video autoPlay ref={othrStrRef} className='stream-two video-stream'></video> : <div className='persona'>
+                                <Persona size={PersonaSize.size120} text={iUser ? iUser.username : 'Anonymous'} hidePersonaDetails /> </div>
+
+                            } </> : null}
+                        {callStatus === CallStatus.outgoing ?  <div className='stream-two video-stream'>  <Persona size={PersonaSize.size120} text={selectedUser.username} hidePersonaDetails/> <br/> Calling {selectedUser.username}</div> : null}
+
+                    </div>
+                    <div className='controls-div'>
+                        <FontIcon iconName="DeclineCall" className='decline-btn call-btn' onClick={() => handleDisconnect(true)} />
+                    </div>
+
+                </div> : null}
+                {callStatus === CallStatus.incoming ? <div className='incoming-div'>
+                    <div className='incoming'> <Persona size={PersonaSize.size120} text={iUser? iUser.username : '' } hidePersonaDetails/> {iUser ?  `${iUser.username} calling` : ''}</div>
+                    <div className='call-decision-div'>
+                        <FontIcon iconName="IncomingCall" className='accept-btn call-btn' onClick={handleAccept} />
+                        <FontIcon iconName="DeclineCall" className='decline-btn call-btn' onClick={handleDecline} />
+                    </div>
+                </div> : null}
+            </Modal>
         </div>
     )
 }
