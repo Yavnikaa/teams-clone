@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { Redirect } from 'react-router'
 import { useHistory } from 'react-router'
 import axios from 'axios'
-import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton,Callout, FontIcon, Modal } from '@fluentui/react'
+import { TextField, Persona, PersonaSize, Stack, PersonaPresence, IconButton, Callout, FontIcon, Modal } from '@fluentui/react'
 import Peer from 'peerjs'
 import './styles.css'
 import { FontSizes, FontWeights } from '@fluentui/theme';
@@ -40,6 +40,7 @@ const Dashboard = ({ }) => {
     const myStrRef = useCallback(node => {
         if (node !== null && stream1 !== null) {
             node.srcObject = stream1
+            node.muted=true
         }
     })
     const othrStrRef = useCallback(node => {
@@ -180,6 +181,7 @@ const Dashboard = ({ }) => {
             })
             const call = peer.call(selectedUser._id, stream);
             call.on('stream', (stream) => {
+                console.log('stream', stream)
                 setCallStatus(CallStatus.ongoing)
                 setStream2(stream)
             })
@@ -211,13 +213,19 @@ const Dashboard = ({ }) => {
             })
         }
     }
+
     const handleAccept = () => {
         const handleSuccess = (stream) => {
             setStream1(stream)
-            if (iCall) iCall.answer(stream)
+            if (iCall)
+                iCall.answer(stream);
         }
         const handleFail = () => {
-            if (iCall) iCall.answer();
+            if (iCall)
+                iCall.answer();
+        }
+        if (iCall) {
+            iCall.on('stream', (stream) => setStream2(stream))
         }
         setCallStatus(CallStatus.ongoing)
         if (iUser) {
@@ -228,6 +236,7 @@ const Dashboard = ({ }) => {
         }
         requestLocalVideo(handleSuccess, handleFail)
     }
+
     const handleDecline = () => {
         if (iUser) {
             const conn = peer.connect(iUser._id);
@@ -331,15 +340,15 @@ const Dashboard = ({ }) => {
                     <div className='stream-div'>
                         {stream1 ?
                             <video autoPlay ref={myStrRef} className='stream-one video-stream'></video> : <div className='persona'>
-                            <Persona size={PersonaSize.size120} text={username} hidePersonaDetails /> </div>
+                                <Persona size={PersonaSize.size120} text={username} hidePersonaDetails /> </div>
                         }
                         {callStatus === CallStatus.ongoing ? <>
                             {stream2 ?
                                 <video autoPlay ref={othrStrRef} className='stream-two video-stream'></video> : <div className='persona'>
-                                <Persona size={PersonaSize.size120} text={iUser ? iUser.username : 'Anonymous'} hidePersonaDetails /> </div>
+                                    <Persona size={PersonaSize.size120} text={iUser ? iUser.username : selectedUser.username} hidePersonaDetails /> </div>
 
                             } </> : null}
-                        {callStatus === CallStatus.outgoing ?  <div className='stream-two video-stream'>  <Persona size={PersonaSize.size120} text={selectedUser.username} hidePersonaDetails/> <br/> Calling {selectedUser.username}</div> : null}
+                        {callStatus === CallStatus.outgoing ? <div className='stream-two video-stream'>  <Persona size={PersonaSize.size120} text={selectedUser.username} hidePersonaDetails /> <br /> Calling {selectedUser.username}</div> : null}
 
                     </div>
                     <div className='controls-div'>
@@ -348,7 +357,7 @@ const Dashboard = ({ }) => {
 
                 </div> : null}
                 {callStatus === CallStatus.incoming ? <div className='incoming-div'>
-                    <div className='incoming'> <Persona size={PersonaSize.size120} text={iUser? iUser.username : '' } hidePersonaDetails/> {iUser ?  `${iUser.username} calling` : ''}</div>
+                    <div className='incoming'> <Persona size={PersonaSize.size120} text={iUser ? iUser.username : ''} hidePersonaDetails /> {iUser ? `${iUser.username} calling` : ''}</div>
                     <div className='call-decision-div'>
                         <FontIcon iconName="IncomingCall" className='accept-btn call-btn' onClick={handleAccept} />
                         <FontIcon iconName="DeclineCall" className='decline-btn call-btn' onClick={handleDecline} />
