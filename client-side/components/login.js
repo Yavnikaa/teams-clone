@@ -45,6 +45,7 @@ const Login = (props) => {
                 <img src={LoginImage} className="image-login" />
             </section>
             <div style={{ boxShadow: Depths.depth8 }} className="floatright">
+                <br/>
                 <div style={{ fontSize: FontSizes.size24 }}>
                     Login here!
                 </div>

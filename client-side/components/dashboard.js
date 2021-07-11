@@ -349,7 +349,7 @@ const Dashboard = ({ }) => {
                                 }
                             }}
                         />
-                        <IconButton iconName="Send" onClick={sendMessage} className='send-btn'  />
+                        <IconButton iconName="Send" onClick={sendMessage} className='send-btn' />
                     </div>
                 </div>
             </div>
@@ -383,8 +383,8 @@ const Dashboard = ({ }) => {
 
                     </div>
                     <div className='controls-div'>
-                        <FontIcon iconName="Microphone" className='mute-btn call-btn' onClick={() => handleMute(mute)} />
-                        <FontIcon iconName="Camera" className='vid-btn call-btn' onClick={() => handleVideo(vid)} />
+                        <FontIcon iconName="Microphone" className={ `call-btn ${mute===false ? 'mute-btn': 'unmute-btn'}`} onClick={() => handleMute(mute)} />
+                        <FontIcon iconName="Camera" className={ `call-btn ${vid===false ? 'vid-btn': 'unmute-btn'}`} onClick={() => handleVideo(vid)} />
                         <FontIcon iconName="DeclineCall" className='decline-btn call-btn' onClick={() => handleDisconnect(true)} />
                     </div>
 
@@ -392,8 +392,6 @@ const Dashboard = ({ }) => {
                 {callStatus === CallStatus.incoming ? <div className='incoming-div'>
                     <div className='incoming'> <Persona size={PersonaSize.size120} text={iUser ? iUser.username : ''} hidePersonaDetails /> {iUser ? `${iUser.username} calling` : ''}</div>
                     <div className='call-decision-div'>
-                        <FontIcon iconName="Microphone" className={ `call-btn ${mute===true ? 'mute-btn': 'unmute-btn'}`} onClick={() => handleMute(mute)} />
-                        <FontIcon iconName="Camera" className={ `call-btn ${vid===true ? 'vid-btn': 'unmute-btn'}`} onClick={() => handleVideo(vid)} />
                         <FontIcon iconName="IncomingCall" className='accept-btn call-btn' onClick={handleAccept} />
                         <FontIcon iconName="DeclineCall" className='decline-btn call-btn' onClick={handleDecline} />
                     </div>
