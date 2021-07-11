@@ -276,10 +276,11 @@ hr {
 }
 .call-btn {
   color: #fff;
-  padding: 3px 10px;
+  padding: 5px 12px;
   border-radius: 3px;
   cursor: pointer;
   font-size: 24px;
+  margin-right: 10px;
 }
 .accept-btn {
   background: #00ad56;
@@ -329,3 +330,16 @@ hr {
 .persona{
   padding: 200px;
 }
+
+.mute-btn{
+  background:rgb(16, 110, 190)
+}
+
+.vid-btn{
+  background: slategrey;
+}
+
+.unmute-btn{
+  background: slategray;
+}
+
