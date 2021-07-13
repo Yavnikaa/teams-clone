@@ -99,6 +99,7 @@ const Dashboard = ({ }) => {
 
         }
         catch (error) {
+            console.log("0", error);
         }
     }
     const sendMessage = async () => {
